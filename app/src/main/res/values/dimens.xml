@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Margins -->
+    <dimen name="default_margin">16dp</dimen>
+    <dimen name="small_margin">8dp</dimen>
+
+    <!-- Element sizes -->
+    <dimen name="heart_size">32dp</dimen>
+    <dimen name="cell_size">100dp</dimen>
+    <dimen name="spaceship_size">90dp</dimen>
+    <dimen name="chicken_size">80dp</dimen>
+
+    <!-- Text sizes -->
+    <dimen name="score_text_size">24sp</dimen>
+    <dimen name="button_text_size">18sp</dimen>
+
+    <!-- Button sizes -->
+    <dimen name="button_width">120dp</dimen>
+    <dimen name="button_height">60dp</dimen>
+</resources>

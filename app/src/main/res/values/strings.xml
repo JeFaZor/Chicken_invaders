@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Spaceship vs Chickens</string>
+
+    <!-- UI texts -->
+    <string name="score_label">Score: </string>
+    <string name="game_over">Game Over!</string>
+    <string name="restart">Restart</string>
+    <string name="heart_description">Life heart</string>
+    <!-- Movement buttons -->
+    <string name="move_left">Left</string>
+    <string name="move_right">Right</string>
+
+    <!-- Messages -->
+    <string name="crash_message">Crash!</string>
+    <string name="new_game">New Game</string>
+</resources>
