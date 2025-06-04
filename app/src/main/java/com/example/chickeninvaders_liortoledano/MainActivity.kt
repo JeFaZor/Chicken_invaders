@@ -281,15 +281,23 @@ class MainActivity : AppCompatActivity() {
 
 
     private val oldChickensInLastRow = BooleanArray(COLS) { false }
+    private val oldCoinsInLastRow = BooleanArray(COLS) { false }
+
 
     private fun moveObjectsDown() {
+        // Clean up old objects in last row
         for (col in 0 until COLS) {
             if (oldChickensInLastRow[col] && gameMatrix[ROWS - 1][col] == CellType.CHICKEN) {
                 gameMatrix[ROWS - 1][col] = CellType.EMPTY
             }
+            if (oldCoinsInLastRow[col] && gameMatrix[ROWS - 1][col] == CellType.COIN) {  // הוסף את זה
+                gameMatrix[ROWS - 1][col] = CellType.EMPTY
+            }
             oldChickensInLastRow[col] = false
+            oldCoinsInLastRow[col] = false  // הוסף את זה
         }
 
+        // Move objects down
         for (row in ROWS - 1 downTo 1) {
             for (col in 0 until COLS) {
                 if (gameMatrix[row - 1][col] == CellType.CHICKEN) {
@@ -302,21 +310,24 @@ class MainActivity : AppCompatActivity() {
                         }
                     }
                     gameMatrix[row - 1][col] = CellType.EMPTY
-                } else if (gameMatrix[row - 1][col] == CellType.COIN) {  // הוסף את החלק הזה
+
+                } else if (gameMatrix[row - 1][col] == CellType.COIN) {
                     if (gameMatrix[row][col] == CellType.SPACESHIP) {
                         handleCoinCollection()
                     } else {
                         gameMatrix[row][col] = CellType.COIN
+                        if (row == ROWS - 1) {
+                            oldCoinsInLastRow[col] = true
+                        }
                     }
                     gameMatrix[row - 1][col] = CellType.EMPTY
                 }
             }
         }
 
+        // Clear top row
         for (col in 0 until COLS) {
-            if (gameMatrix[0][col] == CellType.CHICKEN) {
-                gameMatrix[0][col] = CellType.EMPTY
-            } else if (gameMatrix[0][col] == CellType.COIN) {  // הוסף את זה
+            if (gameMatrix[0][col] == CellType.CHICKEN || gameMatrix[0][col] == CellType.COIN) {
                 gameMatrix[0][col] = CellType.EMPTY
             }
         }
