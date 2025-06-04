@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/background"
+    android:padding="@dimen/default_margin">
+
+    <!-- Game Over Title -->
+    <TextView
+        android:id="@+id/gameOver_LBL_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="50dp"
+        android:text="@string/game_over"
+        android:textColor="@color/game_over_color"
+        android:textSize="36sp"
+        android:textStyle="bold" />
+
+    <!-- Game Results -->
+    <LinearLayout
+        android:id="@+id/gameOver_LAY_results"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/gameOver_LBL_title"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="40dp"
+        android:orientation="vertical"
+        android:gravity="center">
+
+        <TextView
+            android:id="@+id/gameOver_LBL_final_score"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/small_margin"
+            android:text="Final Score: 0"
+            android:textColor="@color/score_text_color"
+            android:textSize="24sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/gameOver_LBL_coins"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/small_margin"
+            android:text="Coins Collected: 0"
+            android:textColor="@color/score_text_color"
+            android:textSize="18sp" />
+
+        <TextView
+            android:id="@+id/gameOver_LBL_distance"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/default_margin"
+            android:text="Distance Traveled: 0"
+            android:textColor="@color/score_text_color"
+            android:textSize="18sp" />
+
+    </LinearLayout>
+
+    <!-- Player Name Input -->
+    <LinearLayout
+        android:id="@+id/gameOver_LAY_name_input"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/gameOver_LAY_results"
+        android:layout_marginTop="30dp"
+        android:orientation="vertical"
+        android:gravity="center">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/small_margin"
+            android:text="Enter Your Name:"
+            android:textColor="@color/score_text_color"
+            android:textSize="18sp" />
+
+        <EditText
+            android:id="@+id/gameOver_ET_player_name"
+            android:layout_width="250dp"
+            android:layout_height="50dp"
+            android:layout_marginBottom="@dimen/default_margin"
+            android:background="@android:color/white"
+            android:gravity="center"
+            android:hint="Player Name"
+            android:inputType="textPersonName"
+            android:maxLength="20"
+            android:textColor="@android:color/black"
+            android:textSize="16sp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/gameOver_BTN_save_score"
+            android:layout_width="200dp"
+            android:layout_height="@dimen/button_height"
+            android:text="Save Score"
+            android:textSize="@dimen/button_text_size" />
+
+    </LinearLayout>
+
+    <!-- Action Buttons -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="40dp"
+        android:orientation="horizontal">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/gameOver_BTN_new_game"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/button_height"
+            android:layout_weight="1"
+            android:layout_marginEnd="@dimen/small_margin"
+            android:text="@string/new_game"
+            android:textSize="@dimen/button_text_size" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/gameOver_BTN_main_menu"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/button_height"
+            android:layout_weight="1"
+            android:layout_marginStart="@dimen/small_margin"
+            android:text="Main Menu"
+            android:textSize="@dimen/button_text_size"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
+
+    </LinearLayout>
+
+</RelativeLayout>

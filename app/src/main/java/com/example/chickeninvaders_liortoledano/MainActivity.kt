@@ -16,27 +16,41 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.gridlayout.widget.GridLayout
 import com.google.android.material.button.MaterialButton
 import android.os.VibratorManager
+import android.widget.TextView
+import com.example.chickeninvaders_liortoledano.utilities.SingleSoundPlayer
+import com.example.chickeninvaders_liortoledano.utilities.TiltDetector
+import com.example.chickeninvaders_liortoledano.interfaces.TiltCallback
+import android.content.Intent
 
 class MainActivity : AppCompatActivity() {
 
     // Constants for game configuration
     companion object {
-        const val ROWS = 5
-        const val COLS = 3
+        const val ROWS = 8
+        const val COLS = 5
         const val MAX_LIVES = 3
-        const val INITIAL_DELAY = 1000L  // Milliseconds between game updates
+        const val SLOW_DELAY = 1500L
+        const val FAST_DELAY = 800L
+        const val SENSOR_DELAY = 1000L
+
     }
 
     // Cell types for the game matrix
     enum class CellType {
         EMPTY,
         SPACESHIP,
-        CHICKEN
+        CHICKEN,
+        COIN
     }
 
     // Game state variables
     private var lives = MAX_LIVES
+    private var coinsCollected = 0
+    private var distance = 0
+    private var score = 0
     private var isGameActive = false
+    private lateinit var controlMode: String
+    private var currentSpeed = SENSOR_DELAY
 
     // Game board matrix
     private lateinit var gameMatrix: Array<Array<CellType>>
@@ -47,9 +61,12 @@ class MainActivity : AppCompatActivity() {
 
     // UI Elements
     private lateinit var hearts: Array<ImageView>
+    private lateinit var coinsLabel: TextView
+    private lateinit var distanceLabel: TextView
     private lateinit var btnLeft: MaterialButton
     private lateinit var btnRight: MaterialButton
     private lateinit var gridGameBoard: GridLayout
+    private lateinit var tiltDetector: TiltDetector
 
     // Game board cells (ImageViews)
     private lateinit var cellViews: Array<Array<ImageView>>
@@ -60,7 +77,7 @@ class MainActivity : AppCompatActivity() {
         override fun run() {
             updateGame()
             if (isGameActive) {
-                handler.postDelayed(this, INITIAL_DELAY)
+                handler.postDelayed(this, getGameDelay())  // שנה את זה גם
             }
         }
     }
@@ -69,6 +86,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
+        controlMode = intent.getStringExtra("CONTROL_MODE") ?: "BUTTON_SLOW"
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
@@ -87,6 +105,45 @@ class MainActivity : AppCompatActivity() {
 
         // Start game
         startGame()
+        initTiltDetector()
+        // Start tilt detector if in sensor mode
+        if (controlMode == "SENSOR") {
+            tiltDetector.start()
+        }
+
+    }
+
+    private fun initTiltDetector() {
+        tiltDetector = TiltDetector(
+            context = this,
+            tiltCallback = object : TiltCallback {
+                override fun tiltLeft() {
+                    if (controlMode == "SENSOR") {
+                        moveSpaceship(0, -1) // Move left
+                    }
+                }
+
+                override fun tiltRight() {
+                    if (controlMode == "SENSOR") {
+                        moveSpaceship(0, 1) // Move right
+                    }
+                }
+
+                override fun tiltForward() {
+                    if (controlMode == "SENSOR") {
+                        currentSpeed = FAST_DELAY // Fast when tilted forward
+                    }
+                }
+
+                override fun tiltBackward() {
+                    if (controlMode == "SENSOR") {
+                        currentSpeed = SLOW_DELAY // Slow when tilted backward
+                    }
+                }
+
+
+            }
+        )
     }
 
     private fun initGameMatrix() {
@@ -97,6 +154,15 @@ class MainActivity : AppCompatActivity() {
         gameMatrix[spaceshipRow][spaceshipCol] = CellType.SPACESHIP
     }
 
+    private fun getGameDelay(): Long {
+        return when (controlMode) {
+            "BUTTON_SLOW" -> SLOW_DELAY
+            "BUTTON_FAST" -> FAST_DELAY
+            "SENSOR" -> currentSpeed
+            else -> SLOW_DELAY
+        }
+    }
+
     private fun findViews() {
         // Find heart ImageViews
         hearts = arrayOf(
@@ -104,6 +170,10 @@ class MainActivity : AppCompatActivity() {
             findViewById(R.id.main_IMG_heart2),
             findViewById(R.id.main_IMG_heart3)
         )
+
+        coinsLabel = findViewById(R.id.main_LBL_coins)
+        distanceLabel = findViewById(R.id.main_LBL_distance)
+
 
         // Find buttons
         btnLeft = findViewById(R.id.main_BTN_left)
@@ -114,9 +184,15 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun initViews() {
-        // Set button click listeners
-        btnLeft.setOnClickListener { moveSpaceship(0, -1) }
-        btnRight.setOnClickListener { moveSpaceship(0, 1) }
+        // Set button click listeners only for button modes
+        if (controlMode != "SENSOR") {
+            btnLeft.setOnClickListener { moveSpaceship(0, -1) }
+            btnRight.setOnClickListener { moveSpaceship(0, 1) }
+        } else {
+            // Hide buttons in sensor mode
+            btnLeft.visibility = View.GONE
+            btnRight.visibility = View.GONE
+        }
     }
 
     private fun createGameBoard() {
@@ -161,6 +237,7 @@ class MainActivity : AppCompatActivity() {
                     CellType.EMPTY -> cell.setImageResource(android.R.color.transparent)
                     CellType.SPACESHIP -> cell.setImageResource(R.drawable.spaceship)
                     CellType.CHICKEN -> cell.setImageResource(R.drawable.chicken)
+                    CellType.COIN -> cell.setImageResource(R.drawable.coin)
                 }
             }
         }
@@ -169,11 +246,15 @@ class MainActivity : AppCompatActivity() {
         for (i in hearts.indices) {
             hearts[i].visibility = if (i < lives) View.VISIBLE else View.INVISIBLE
         }
+        coinsLabel.text = "Coins: $coinsCollected"
+        distanceLabel.text = "Distance: $distance"
+
+
     }
 
     private fun startGame() {
         isGameActive = true
-        handler.postDelayed(gameRunnable, INITIAL_DELAY)
+        handler.postDelayed(gameRunnable, getGameDelay())
     }
 
     private fun stopGame() {
@@ -183,10 +264,16 @@ class MainActivity : AppCompatActivity() {
 
     private fun updateGame() {
         // Move existing chickens down
-        moveChickensDown()
+        moveObjectsDown()
 
-        // Generate new chickens at the top row with some probability
-        generateNewChickens()
+        // Generate new chickens and coins at the top row
+        generateNewObjects()
+
+        // Update distance counter
+        distance++
+
+        // Update score (distance gives points + coins give bonus)
+        score = distance + (coinsCollected * 10)
 
         // Update UI
         updateUI()
@@ -195,14 +282,13 @@ class MainActivity : AppCompatActivity() {
 
     private val oldChickensInLastRow = BooleanArray(COLS) { false }
 
-    private fun moveChickensDown() {
+    private fun moveObjectsDown() {
         for (col in 0 until COLS) {
             if (oldChickensInLastRow[col] && gameMatrix[ROWS - 1][col] == CellType.CHICKEN) {
                 gameMatrix[ROWS - 1][col] = CellType.EMPTY
             }
             oldChickensInLastRow[col] = false
         }
-
 
         for (row in ROWS - 1 downTo 1) {
             for (col in 0 until COLS) {
@@ -211,10 +297,16 @@ class MainActivity : AppCompatActivity() {
                         handleCollision()
                     } else {
                         gameMatrix[row][col] = CellType.CHICKEN
-
                         if (row == ROWS - 1) {
-                            oldChickensInLastRow[col] = true;
+                            oldChickensInLastRow[col] = true
                         }
+                    }
+                    gameMatrix[row - 1][col] = CellType.EMPTY
+                } else if (gameMatrix[row - 1][col] == CellType.COIN) {  // הוסף את החלק הזה
+                    if (gameMatrix[row][col] == CellType.SPACESHIP) {
+                        handleCoinCollection()
+                    } else {
+                        gameMatrix[row][col] = CellType.COIN
                     }
                     gameMatrix[row - 1][col] = CellType.EMPTY
                 }
@@ -224,18 +316,26 @@ class MainActivity : AppCompatActivity() {
         for (col in 0 until COLS) {
             if (gameMatrix[0][col] == CellType.CHICKEN) {
                 gameMatrix[0][col] = CellType.EMPTY
+            } else if (gameMatrix[0][col] == CellType.COIN) {  // הוסף את זה
+                gameMatrix[0][col] = CellType.EMPTY
             }
         }
     }
-    private fun generateNewChickens() {
-        val chickensInRow = BooleanArray(COLS) { false }
+    private fun generateNewObjects() {
         var chickenCount = 0
 
-
+        // Generate chickens
         for (col in 0 until COLS) {
             if (Math.random() < 0.15 && chickenCount < 2) {
                 gameMatrix[0][col] = CellType.CHICKEN
                 chickenCount++
+            }
+        }
+
+        // Generate coins (lower probability than chickens)
+        for (col in 0 until COLS) {
+            if (gameMatrix[0][col] == CellType.EMPTY && Math.random() < 0.1) {
+                gameMatrix[0][col] = CellType.COIN
             }
         }
     }
@@ -248,8 +348,11 @@ class MainActivity : AppCompatActivity() {
         // Check if the new position is valid
         if (newCol in 0 until COLS && newRow in 0 until ROWS) {
             // Check if there's a chicken at the new position
+            // Check if there's a chicken at the new position
             if (gameMatrix[newRow][newCol] == CellType.CHICKEN) {
                 handleCollision()
+            } else if (gameMatrix[newRow][newCol] == CellType.COIN) {
+                handleCoinCollection()
             }
 
             // Clear current position
@@ -268,6 +371,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun handleCollision() {
+        SingleSoundPlayer(this).playSound(R.raw.crash)
         // Vibrate device - with compatibility for newer Android versions
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.S) {
             // For Android 12 (API 31) and higher
@@ -293,22 +397,35 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun handleCoinCollection() {
+        coinsCollected++
+
+    }
+
     private fun gameOver() {
         // Stop game updates
         stopGame()
 
-        // Show game over message
-        Toast.makeText(this, R.string.game_over, Toast.LENGTH_LONG).show()
+        // Calculate final score
+        score = distance + (coinsCollected * 10)
 
-        // Reset the game after a delay
-        handler.postDelayed({
-            resetGame()
-        }, 3000)
+        // Navigate to game over screen
+        val intent = Intent(this, GameOverActivity::class.java)
+        intent.putExtra("FINAL_SCORE", score)
+        intent.putExtra("FINAL_COINS", coinsCollected)
+        intent.putExtra("FINAL_DISTANCE", distance)
+        startActivity(intent)
+        finish() // Close the game
     }
 
     private fun resetGame() {
         // Reset lives
         lives = MAX_LIVES
+
+        // Reset counters
+        coinsCollected = 0
+        distance = 0
+        score = 0
 
         // Reset game matrix
         initGameMatrix()
@@ -324,5 +441,34 @@ class MainActivity : AppCompatActivity() {
         super.onDestroy()
         // Make sure to stop the handler when the activity is destroyed
         stopGame()
+
+        // Stop tilt detector
+        if (controlMode == "SENSOR") {
+            tiltDetector.stop()
+        }
+    }
+    override fun onPause() {
+        super.onPause()
+        // Stop game when app goes to background
+        if (isGameActive) {
+            stopGame()
+        }
+
+        // Stop tilt detector if in sensor mode
+        if (controlMode == "SENSOR") {
+            tiltDetector.stop()
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (!isGameActive) {
+            startGame()
+        }
+
+        // Start tilt detector if in sensor mode
+        if (controlMode == "SENSOR") {
+            tiltDetector.start()
+        }
     }
 }

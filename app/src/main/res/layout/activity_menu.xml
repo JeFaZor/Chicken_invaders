@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/background"
+    android:padding="@dimen/default_margin">
+
+    <!-- Game Title -->
+    <TextView
+        android:id="@+id/menu_LBL_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="50dp"
+        android:text="@string/app_name"
+        android:textColor="@color/score_text_color"
+        android:textSize="32sp"
+        android:textStyle="bold" />
+
+    <!-- Control Mode Buttons -->
+    <LinearLayout
+        android:id="@+id/menu_LAY_control_modes"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:layout_marginHorizontal="@dimen/default_margin"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="@dimen/default_margin"
+            android:text="Choose Control Mode:"
+            android:textColor="@color/score_text_color"
+            android:textSize="18sp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/menu_BTN_button_slow"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/button_height"
+            android:layout_marginBottom="@dimen/small_margin"
+            android:text="Button Mode - Slow"
+            android:textSize="@dimen/button_text_size" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/menu_BTN_button_fast"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/button_height"
+            android:layout_marginBottom="@dimen/small_margin"
+            android:text="Button Mode - Fast"
+            android:textSize="@dimen/button_text_size" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/menu_BTN_sensor_mode"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/button_height"
+            android:layout_marginBottom="@dimen/default_margin"
+            android:text="Sensor Mode"
+            android:textSize="@dimen/button_text_size" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/menu_BTN_high_scores"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/button_height"
+            android:text="High Scores"
+            android:textSize="@dimen/button_text_size"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton" />
+
+    </LinearLayout>
+
+</RelativeLayout>

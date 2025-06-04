@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Spaceship vs Chickens</string>
+    <string name="app_name">Chicken Invaders</string>
 
     <!-- UI texts -->
     <string name="score_label">Score: </string>

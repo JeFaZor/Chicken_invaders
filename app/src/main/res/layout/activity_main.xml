@@ -39,6 +39,24 @@
             android:layout_height="@dimen/heart_size"
             android:contentDescription="@string/heart_description"
             app:srcCompat="@drawable/heart" />
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/main_LBL_coins"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/default_margin"
+            android:text="Coins: 0"
+            android:textColor="@color/score_text_color"
+            android:textSize="@dimen/score_text_size"
+            android:layout_gravity="center_vertical" />
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/main_LBL_distance"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/default_margin"
+            android:text="Distance: 0"
+            android:textColor="@color/score_text_color"
+            android:textSize="@dimen/score_text_size"
+            android:layout_gravity="center_vertical" />
     </LinearLayout>
 
     <!-- Game board (Matrix) -->
@@ -47,8 +65,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
-        app:columnCount="3"
-        app:rowCount="5">
+        app:columnCount="5"
+        app:rowCount="8">
 
         <!-- Grid cells will be added programmatically -->
 
